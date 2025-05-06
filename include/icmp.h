@@ -20,6 +20,7 @@ typedef enum icmp_type {
 } icmp_type_t;
 
 typedef enum icmp_code {
+    ICMP_CODE_ZERO = 0,
     ICMP_CODE_PROTOCOL_UNREACH = 2,  // 协议不可达
     ICMP_CODE_PORT_UNREACH = 3       // 端口不可达
 } icmp_code_t;
