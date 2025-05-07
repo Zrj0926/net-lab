@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include "net.h"
+#include "ip.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -106,4 +107,26 @@ typedef struct peso_hdr {
  */
 uint16_t transport_checksum(uint8_t protocol, buf_t *buf, uint8_t *src_ip, uint8_t *dst_ip) {
     // TO-DO
+    buf_add_header(buf, sizeof(peso_hdr_t));
+    peso_hdr_t ip_hdr;  //原ip头被覆盖的部分
+    memcpy(&ip_hdr, buf->data, sizeof(peso_hdr_t));
+    
+    peso_hdr_t *hdr = (peso_hdr_t *)buf->data;
+    memcpy(hdr->src_ip, src_ip, NET_IP_LEN);
+    memcpy(hdr->dst_ip, dst_ip, NET_IP_LEN);
+    hdr->protocol = protocol;
+    hdr->placeholder = 0;
+    hdr->total_len16 = swap16(buf->len - sizeof(peso_hdr_t));
+
+    int is_padding = buf->len % 2;
+    if(is_padding) buf_add_padding(buf, 1);
+
+    uint16_t checksum = checksum16((uint16_t *)buf->data, buf->len);
+
+    if(is_padding) buf_remove_padding(buf, 1);
+
+    memcpy(buf->data, &ip_hdr, sizeof(peso_hdr_t));
+    buf_remove_header(buf, sizeof(peso_hdr_t));
+
+    return checksum;
 }
