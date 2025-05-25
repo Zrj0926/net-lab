@@ -182,7 +182,7 @@ void tcp_in(buf_t *buf, uint8_t *src_ip) {
             // TODO: 仅在收到连接报文时（SYN报文）才做出处理，否则直接返回
             if(!TCP_FLG_ISSET(recv_flags, TCP_FLG_SYN)) return;
             // TODO: 初始化 TCP 连接上下文（tcp_conn结构体）的seq字段
-            tcp_conn->seq = remote_seq + 1;
+            tcp_conn->seq = tcp_generate_initial_seq();
             // TODO: 填写 TCP 连接上下文（tcp_conn结构体）的ack字段
             tcp_conn->ack = remote_seq + 1;
             // TODO: 填写回复标志 send_flags
